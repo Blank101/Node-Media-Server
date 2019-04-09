@@ -44,13 +44,25 @@ class NodeTransSession extends EventEmitter {
       mapStr += mapDash;
       Logger.log('[Transmuxing DASH] ' + this.conf.streamPath + ' to ' + ouPath + '/' + dashFileName);
     }
+    if (this.conf.thumbs) {
+      this.conf.thumbsFlags = this.conf.thumbsFlags ? this.conf.thumbsFlags : '';
+      let thumbsFileName = 'thumbs%d.png';
+      let mapThumbs = `${this.conf.thumbsFlags}${ouPath}/${thumbsFileName}`;
+      mapStr += mapThumbs;
+      Logger.log('[Transmuxing THUMBNAILS] ' + this.conf.streamPath + ' to ' + ouPath + '/' + thumbsFileName);
+    }
     mkdirp.sync(ouPath);
     let argv = ['-y', '-fflags', 'nobuffer', '-i', inPath];
-    Array.prototype.push.apply(argv, ['-c:v', vc]);
-    Array.prototype.push.apply(argv, this.conf.vcParam);
-    Array.prototype.push.apply(argv, ['-c:a', ac]);
-    Array.prototype.push.apply(argv, this.conf.acParam);
-    Array.prototype.push.apply(argv, ['-f', 'tee', '-map', '0:a?', '-map', '0:v?', mapStr]);
+    if (this.conf.customArgs) {
+      Array.prototype.push.apply(argv, this.conf.customArgs);
+    } else {
+      Array.prototype.push.apply(argv, ['-c:v', vc]);
+      Array.prototype.push.apply(argv, this.conf.vcParam);
+      Array.prototype.push.apply(argv, ['-c:a', ac]);
+      Array.prototype.push.apply(argv, this.conf.acParam);
+      Array.prototype.push.apply(argv, ['-f', 'tee', '-map', '0:a?', '-map', '0:v?']);
+    }
+    Array.prototype.push.apply(argv, [mapStr]);
     argv = argv.filter((n) => { return n }); //去空
     this.ffmpeg_exec = spawn(this.conf.ffmpeg, argv);
     this.ffmpeg_exec.on('error', (e) => {
