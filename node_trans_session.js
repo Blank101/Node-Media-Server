@@ -46,7 +46,7 @@ class NodeTransSession extends EventEmitter {
     }
     if (this.conf.thumbs) {
       this.conf.thumbsFlags = this.conf.thumbsFlags ? this.conf.thumbsFlags : '';
-      let thumbsFileName = 'thumbs%d.png';
+      let thumbsFileName = this.conf.thumbsFileName ? this.conf.thumbsFileName : 'thumb%d.png';
       let mapThumbs = `${this.conf.thumbsFlags}${ouPath}/${thumbsFileName}`;
       mapStr += mapThumbs;
       Logger.log('[Transmuxing THUMBNAILS] ' + this.conf.streamPath + ' to ' + ouPath + '/' + thumbsFileName);
